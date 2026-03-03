@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileParserService } from '../../services/file-parser.service';
 import { GaugeComponent } from '../gauge/gauge.component';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-ats-checker',
@@ -42,7 +43,13 @@ export class AtsCheckerComponent {
   readonly SOFT_DICT = ['leadership', 'management', 'communication', 'problem', 'teamwork', 'collaboration', 'strategy', 'planning', 'mentoring', 'agile', 'scrum', 'creativity', 'adaptability', 'analytical', 'interpersonal', 'presentation', 'negotiation'];
   readonly PHRASE_DICT = ['web development', 'software engineering', 'project management', 'cloud computing', 'full stack', 'data science', 'machine learning', 'artificial intelligence', 'unit testing', 'user interface', 'front end', 'back end', 'micro services', 'mobile apps', 'rest api', 'responsive design'];
 
-  constructor(private parser: FileParserService) {}
+  constructor(private parser: FileParserService,private seo: SeoService ) {
+      this.seo.updateSeoData(
+      'Free ATS Resume Checker - Match Resume to Job Description',
+      'Optimize your resume with our Smart ATS Check. Upload your resume and JD to find missing keywords and improve your hiring chances.',
+      'ATS scanner, resume checker, keyword optimization, job application tool, ATS score'
+    );
+  }
 
   async onFileUpload(event: any) {
     const file = event.target.files[0];
@@ -101,7 +108,16 @@ export class AtsCheckerComponent {
     this.techMissing.set([...new Set(tm)]);
     this.softMissing.set([...new Set(sm)]);
     this.score.set(weightedTotal > 0 ? Math.round((weightedEarned / weightedTotal) * 100) : 0);
+    const finalScore = weightedTotal > 0 ? Math.round((weightedEarned / weightedTotal) * 100) : 0;
     this.isScanning.set(false);
+
+    // 2. Dynamic SEO Update after Scan
+    // This helps if the user shares their URL or for modern search engine indexing
+    this.seo.updateSeoData(
+      `My ATS Score: ${finalScore}% | ATS Smart Check Results`,
+      `I just scored ${finalScore}% on my resume match! Check your own resume against any JD for free.`,
+      'ATS score, resume results, career optimization'
+    );
   }
 
   // AI FUNCTION COMMENTED FOR LATER
